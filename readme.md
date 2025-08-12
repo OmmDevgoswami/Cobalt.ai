@@ -29,7 +29,7 @@ PORT=3000
 ### To run the Slack-Messenger locally, follow these steps:
 1. On the GitHub page for this repository, click on the button "Fork."
 2. Clone your forked repository to your computer by typing the following command in the Terminal: 
-``` https://github.com/<your-github-username>/Cobalt.ai.git ```
+``` https://github.com/<your-github-username>/Refold-Intern-Cobalt-Assignment.git ```
 3. Navigate into the cloned repository by typing the following command in the Terminal:
 ``` cd <project-file> ``` and then run ```npm install```
 4. Set-up the Credentials
