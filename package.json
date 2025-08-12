@@ -1,0 +1,19 @@
+{
+    "name": "slack-connect-starter",
+    "version": "1.0.0",
+    "description": "Slack Connect starter: OAuth, immediate send, schedule send (vanilla HTML + Node/Express)",
+    "main": "backend/server.js",
+    "scripts": {
+        "start": "node backend/server.js"
+    },
+    "dependencies": {
+        "axios": "^1.11.0",
+        "body-parser": "^1.20.3",
+        "cors": "^2.8.5",
+        "dotenv": "^17.2.1",
+        "express": "^4.21.2",
+        "node-cron": "^3.0.3",
+        "sqlite3": "^5.1.7",
+        "uuid": "^9.0.0"
+    }
+}

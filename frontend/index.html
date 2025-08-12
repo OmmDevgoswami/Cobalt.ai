@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slack Scheduler</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div class="container py-5">
+  <h1 class="mb-4 text-center">Slack Message Scheduler</h1>
+
+  <div class="text-center mb-4">
+    <a href="/auth/slack" class="btn btn-primary btn-lg">Connect to Slack</a>
+  </div>
+
+  <!-- Message Form -->
+  <div class="card shadow-sm mb-5">
+    <div class="card-body">
+      <form id="messageForm">
+        <div class="mb-3">
+          <label for="channelSelect" class="form-label">Select Channel</label>
+          <select id="channelSelect" class="form-select" required></select>
+        </div>
+        <div class="mb-3">
+          <label for="messageText" class="form-label">Message</label>
+          <textarea id="messageText" class="form-control" rows="3" required></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="sendAt" class="form-label">Schedule Time (optional)</label>
+          <input type="datetime-local" id="sendAt" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-success w-100">Send / Schedule</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scheduled Messages Section -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">Scheduled Messages</h5>
+      <ul id="scheduledList" class="list-group"></ul>
+    </div>
+  </div>
+</div>
+
+<script>
+async function loadChannels() {
+  const res = await fetch('/api/channels');
+  const data = await res.json();
+  const select = document.getElementById('channelSelect');
+  select.innerHTML = '<option value="">-- Choose a channel --</option>';
+  if (data.ok) {
+    data.channels.forEach(ch => {
+      const opt = document.createElement('option');
+      opt.value = ch.id;
+      opt.textContent = `#${ch.name}`;
+      select.appendChild(opt);
+    });
+  }
+}
+
+async function loadScheduledMessages() {
+  const res = await fetch('/api/scheduled');
+  const data = await res.json();
+  const list = document.getElementById('scheduledList');
+  list.innerHTML = '';
+
+  if (data.ok && data.messages.length > 0) {
+    data.messages.forEach(msg => {
+      const li = document.createElement('li');
+      li.className = 'list-group-item d-flex justify-content-between align-items-center';
+      li.innerHTML = `
+          <div>
+            <strong>#${msg.channel}</strong>: ${msg.text} <br>
+            <small>Scheduled for: ${new Date(msg.post_at * 1000).toLocaleString()}</small>
+          </div>
+          <button class="btn btn-danger btn-sm" onclick="cancelMessage('${msg.id}')">Cancel</button>
+        `;
+      list.appendChild(li);
+    });
+  } else {
+    const li = document.createElement('li');
+    li.className = 'list-group-item text-muted';
+    li.textContent = 'No scheduled messages';
+    list.appendChild(li);
+  }
+}
+
+async function cancelMessage(id) {
+  if (!confirm('Are you sure you want to cancel this message?')) return;
+  await fetch(`/api/cancel/${id}`, { method: 'DELETE' });
+  loadScheduledMessages();
+}
+
+document.getElementById('messageForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const channel = document.getElementById('channelSelect').value;
+  const text = document.getElementById('messageText').value;
+  const sendAt = document.getElementById('sendAt').value;
+
+  if (!channel || !text) return alert('Please select a channel and enter a message');
+
+  if (sendAt) {
+    await fetch('/api/schedule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ channel, text, sendAt })
+    });
+    alert('Message scheduled!');
+    loadScheduledMessages();
+  } else {
+    await fetch('/api/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ channel, text })
+    });
+    alert('Message sent!');
+  }
+
+  document.getElementById('messageForm').reset();
+});
+
+loadChannels();
+loadScheduledMessages();
+</script>
+</body>
+</html>

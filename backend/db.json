@@ -1,0 +1,13 @@
+{
+  "tokens": {
+    "bot_token": "xoxb-9037657823280-9326304356359-aCYTvxNejgyr6PdrQe7ySUvA",
+    "scope": "chat:write,channels:read,im:read,mpim:read,channels:join,users:read",
+    "team": {
+      "id": "T0913KBQ788",
+      "name": "Practice Section"
+    },
+    "app_id": "A099VE23M29",
+    "obtained_at": 1754975027277
+  },
+  "scheduled": []
+}
